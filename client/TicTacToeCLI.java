@@ -7,6 +7,7 @@ import tictactoe.player.user.UserCommand;
 import tictactoe.player.user.UserPlayer;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class TicTacToeCLI {
@@ -52,20 +53,22 @@ public class TicTacToeCLI {
             switch (commandTokens.next().toLowerCase()) {
                 case "start":
                     if (commandTokens.hasNext()) {
-                        Player player1;
+                        var optionalPlayer1 = tryGetPlayer(commandTokens.next());
 
-                        player1 = (commandTokens.next().equalsIgnoreCase("easy"))
-                                ? new TicTacToeEasyAI(BOARD_DIMENSION)
-                                : new UserPlayer(BOARD_DIMENSION);
-
-                        if (commandTokens.hasNext()) {
-                            var player2 = (commandTokens.next().equalsIgnoreCase("easy"))
-                                    ? new TicTacToeEasyAI(BOARD_DIMENSION) :
-                                    new UserPlayer(BOARD_DIMENSION);
-                            userCommand = new UserCommand(player1, player2);
+                        if (optionalPlayer1.isEmpty() || !commandTokens.hasNext()) {
+                            badParameters = true;
+                            break;
                         }
+
+                        var optionalPlayer2 = tryGetPlayer(commandTokens.next());
+
+                        if (optionalPlayer2.isEmpty()) {
+                            badParameters = true;
+                            break;
+                        }
+
+                        userCommand = new UserCommand(optionalPlayer1.get(), optionalPlayer2.get());
                     } else {
-                        System.out.println("Bad parameters");
                         badParameters = true;
                     }
                     break;
@@ -73,10 +76,10 @@ public class TicTacToeCLI {
                     break;
                 default:
                     badParameters = true;
-                    System.out.println("Bad parameters!");
                     break;
             }
             if (badParameters){
+                System.out.println("Bad parameters!");
                 System.out.print("Input command: ");
                 commandTokens = Arrays.stream(SCANNER.nextLine().split(" ")).iterator();
             }
@@ -87,34 +90,51 @@ public class TicTacToeCLI {
 
     public static void runTurn(Player player) {
         var turnNotFinished = true;
-        System.out.printf("%s", player.playerMessage());
-        if (! (player instanceof UserPlayer)) {
-            System.out.println();
-        } else {
-            System.out.print(" ");
-        }
+        System.out.print(player.playerMessage());
         do {
             Coordinate coordinates;
+            String errMessage = "";
+
             try {
                 coordinates = player.getCoordinates();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 continue;
             }
+
             if (!TIC_TAC_TOE.areCoordinatesInBound(coordinates.x, coordinates.y)) {
-                if (player instanceof UserPlayer) {
-                    System.out.printf("Coordinates should be from 1 to %d!%n", BOARD_DIMENSION);
-                }
+               errMessage = String.format("Coordinates should be from 1 to %d!", BOARD_DIMENSION);
             } else if (TIC_TAC_TOE.isCellOccupied(coordinates.x, coordinates.y)) {
-                if (player instanceof  UserPlayer) {
-                    System.out.println("This cell is occupied! Choose another one!");
-                }
+                errMessage = "This cell is occupied! Choose another one!";
             } else {
                 TIC_TAC_TOE.put(coordinates.x, coordinates.y);
                 turnNotFinished = false;
+            }
+
+            if (!errMessage.isEmpty()) {
+                System.out.println(errMessage);
             }
         }while (turnNotFinished);
 
         TIC_TAC_TOE_PRINTER.printBoard();
     }
+
+    private static Optional<Player> tryGetPlayer(String playerName) {
+        Player optionalPlayer;
+
+        switch (playerName.toLowerCase()) {
+            case "easy":
+                optionalPlayer = new TicTacToeEasyAI(BOARD_DIMENSION);
+                break;
+            case "user":
+                optionalPlayer = new UserPlayer(BOARD_DIMENSION);
+                break;
+            default:
+                optionalPlayer = null;
+                break;
+        }
+
+        return Optional.ofNullable(optionalPlayer);
+    }
+
 }

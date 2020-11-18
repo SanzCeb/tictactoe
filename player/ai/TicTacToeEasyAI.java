@@ -10,7 +10,7 @@ public class TicTacToeEasyAI extends Player {
     private static final Random randomizer = new Random();
 
     public TicTacToeEasyAI(int dimension) {
-        super(dimension);
+        super(dimension, false);
     }
 
     public Coordinate getCoordinates() {
@@ -19,6 +19,6 @@ public class TicTacToeEasyAI extends Player {
 
     @Override
     public String playerMessage() {
-        return "Making move level \"easy\"";
+        return "Making move level \"easy\"\n";
     }
 }

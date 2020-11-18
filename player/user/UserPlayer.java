@@ -1,6 +1,5 @@
 package tictactoe.player.user;
 
-import tictactoe.board.Board;
 import tictactoe.player.Coordinate;
 import tictactoe.player.Player;
 
@@ -11,7 +10,7 @@ public class UserPlayer extends Player {
     private static final Scanner SCANNER = new Scanner(System.in);
 
     public UserPlayer(int dimension) {
-        super(dimension);
+        super(dimension, true);
     }
 
     @Override
@@ -27,7 +26,7 @@ public class UserPlayer extends Player {
 
     @Override
     public String playerMessage() {
-        return "Enter the coordinates:";
+        return "Enter the coordinates: ";
     }
 
 }
