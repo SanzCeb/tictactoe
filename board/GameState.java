@@ -1,0 +1,21 @@
+package tictactoe.board;
+
+public enum GameState {
+    X_TURN("X turn"),
+    O_TURN("O turn"),
+    DRAW("Draw"),
+    X_WINS("X wins"),
+    O_WINS("O wins"),
+    IMPOSSIBLE("Impossible");
+
+    private final String message;
+
+    GameState(String message) {
+        this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return message;
+    }
+}
