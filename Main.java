@@ -1,9 +1,9 @@
 package tictactoe;
 
-import tictactoe.client.TicTacToe;
+import tictactoe.client.TicTacToeCLI;
 
 public class Main {
     public static void main(String args[]) {
-        TicTacToe.run();
+        TicTacToeCLI.run();
     }
 }
