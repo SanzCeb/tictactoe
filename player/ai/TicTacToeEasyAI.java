@@ -2,19 +2,15 @@ package tictactoe.player.ai;
 
 import tictactoe.board.Board;
 import tictactoe.player.Coordinate;
-import tictactoe.player.Player;
 
-import java.util.Random;
+public class TicTacToeEasyAI extends TicTacToeAI {
 
-public class TicTacToeEasyAI extends Player {
-    private static final Random randomizer = new Random();
-
-    public TicTacToeEasyAI(int dimension) {
-        super(dimension, false);
+    public TicTacToeEasyAI(Board ticTacToe) {
+        super(ticTacToe);
     }
 
     public Coordinate getCoordinates() {
-        return  new Coordinate(randomizer.nextInt(dimension), randomizer.nextInt(dimension));
+        return  BoardMovesAnalytics.randomMove(TIC_TAC_TOE);
     }
 
     @Override

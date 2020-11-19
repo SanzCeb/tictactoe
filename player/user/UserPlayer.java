@@ -1,6 +1,5 @@
 package tictactoe.player.user;
 
-import tictactoe.board.Board;
 import tictactoe.player.Coordinate;
 import tictactoe.player.Player;
 

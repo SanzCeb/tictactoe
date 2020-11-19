@@ -3,24 +3,32 @@ package tictactoe.client;
 import tictactoe.player.*;
 import tictactoe.board.Board;
 import tictactoe.player.ai.TicTacToeEasyAI;
+import tictactoe.player.ai.TicTacToeMediumAI;
 import tictactoe.player.user.UserCommand;
 import tictactoe.player.user.UserPlayer;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class TicTacToeCLI {
     private final static Scanner SCANNER = new Scanner(System.in);
-    private final static Board TIC_TAC_TOE = new Board(3);
     private final static int BOARD_DIMENSION = 3;
-    private final static BoardPrinter TIC_TAC_TOE_PRINTER = new BoardPrinter(TIC_TAC_TOE);
+    private final static int COMMAND_POSITION = 0;
+    private final static int PLAYER_1_POSITION = 1;
+    private final static int PLAYER_2_POSITION = 2;
+    private static Board tic_tac_toe = new Board(BOARD_DIMENSION);
+    private static BoardPrinter tic_tac_toe_printer = new BoardPrinter(tic_tac_toe);
+
+
 
     public static void run() {
+
         var userCommand = runMenu();
 
         while (userCommand.isNotExitCommand()){
             runCommand(userCommand);
+            tic_tac_toe = new Board(BOARD_DIMENSION);
+            tic_tac_toe_printer = new BoardPrinter(tic_tac_toe);
             userCommand = runMenu();
         }
 
@@ -30,59 +38,55 @@ public class TicTacToeCLI {
         var player1 = userCommand.player1;
         var player2 = userCommand.player2;
 
-        TIC_TAC_TOE_PRINTER.printBoard();
+        tic_tac_toe_printer.printBoard();
 
-        while(TIC_TAC_TOE.isNotFinished()) {
+        while(tic_tac_toe.isNotFinished()) {
             runTurn(player1);
-            if (TIC_TAC_TOE.isNotFinished()) {
+            if (tic_tac_toe.isNotFinished()) {
                 runTurn(player2);
             }
         }
 
-        TIC_TAC_TOE_PRINTER.printGameState();
+        tic_tac_toe_printer.printGameState();
     }
 
     public static UserCommand runMenu() {
-        //Write a menu loop which can interpret two commands: start and exit
         System.out.print("Input command: ");
-        var commandTokens = Arrays.stream(SCANNER.nextLine().split(" ")).iterator();
+        var commandTokens = SCANNER.nextLine().split(" ");
         boolean badParameters;
         UserCommand userCommand = new UserCommand();
+
         do {
             badParameters = false;
-            switch (commandTokens.next().toLowerCase()) {
-                case "start":
-                    if (commandTokens.hasNext()) {
-                        var optionalPlayer1 = tryGetPlayer(commandTokens.next());
+            try {
+                switch (commandTokens[COMMAND_POSITION]) {
+                    case "start":
+                        var optionalPlayer1 = tryGetPlayer(commandTokens[PLAYER_1_POSITION]);
+                        var optionalPlayer2 = tryGetPlayer(commandTokens[PLAYER_2_POSITION]);
 
-                        if (optionalPlayer1.isEmpty() || !commandTokens.hasNext()) {
+                        if (optionalPlayer1.isPresent() && optionalPlayer2.isPresent()) {
+                            userCommand = new UserCommand(optionalPlayer1.get(), optionalPlayer2.get());
+                        } else {
                             badParameters = true;
-                            break;
                         }
 
-                        var optionalPlayer2 = tryGetPlayer(commandTokens.next());
-
-                        if (optionalPlayer2.isEmpty()) {
-                            badParameters = true;
-                            break;
-                        }
-
-                        userCommand = new UserCommand(optionalPlayer1.get(), optionalPlayer2.get());
-                    } else {
+                        break;
+                    case "exit":
+                        break;
+                    default:
                         badParameters = true;
-                    }
-                    break;
-                case "exit":
-                    break;
-                default:
-                    badParameters = true;
-                    break;
+                        break;
+                }
+            }catch (NullPointerException ignored) {
+                badParameters = true;
             }
-            if (badParameters){
+
+            if (badParameters) {
                 System.out.println("Bad parameters!");
                 System.out.print("Input command: ");
-                commandTokens = Arrays.stream(SCANNER.nextLine().split(" ")).iterator();
+                commandTokens = SCANNER.nextLine().split(" ");
             }
+
         } while (badParameters);
 
         return  userCommand;
@@ -102,12 +106,12 @@ public class TicTacToeCLI {
                 continue;
             }
 
-            if (!TIC_TAC_TOE.areCoordinatesInBound(coordinates.x, coordinates.y)) {
+            if (!tic_tac_toe.areCoordinatesInBound(coordinates.x, coordinates.y)) {
                errMessage = String.format("Coordinates should be from 1 to %d!", BOARD_DIMENSION);
-            } else if (TIC_TAC_TOE.isCellOccupied(coordinates.x, coordinates.y)) {
+            } else if (tic_tac_toe.isCellOccupied(coordinates.x, coordinates.y)) {
                 errMessage = "This cell is occupied! Choose another one!";
             } else {
-                TIC_TAC_TOE.put(coordinates.x, coordinates.y);
+                tic_tac_toe.put(coordinates.x, coordinates.y);
                 turnNotFinished = false;
             }
 
@@ -116,7 +120,7 @@ public class TicTacToeCLI {
             }
         }while (turnNotFinished);
 
-        TIC_TAC_TOE_PRINTER.printBoard();
+        tic_tac_toe_printer.printBoard();
     }
 
     private static Optional<Player> tryGetPlayer(String playerName) {
@@ -124,7 +128,10 @@ public class TicTacToeCLI {
 
         switch (playerName.toLowerCase()) {
             case "easy":
-                optionalPlayer = new TicTacToeEasyAI(BOARD_DIMENSION);
+                optionalPlayer = new TicTacToeEasyAI(tic_tac_toe);
+                break;
+            case "medium":
+                optionalPlayer = new TicTacToeMediumAI(tic_tac_toe);
                 break;
             case "user":
                 optionalPlayer = new UserPlayer(BOARD_DIMENSION);

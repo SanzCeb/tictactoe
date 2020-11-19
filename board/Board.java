@@ -20,6 +20,10 @@ public class Board {
         }
     }
 
+    public Board (Board b) {
+        this(b.board, b.gameState);
+    }
+
     private Board (char[][] board, GameState gameState) {
         this.gameState = gameState;
         this.board = new char[board.length][board.length];
