@@ -1,10 +1,8 @@
-package tictactoe.player.ai;
+package tictactoe.board;
 
-import tictactoe.board.Board;
-import tictactoe.board.GameState;
 import tictactoe.player.Coordinate;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -42,23 +40,31 @@ public class BoardMovesAnalytics {
                 .findAny().isPresent();
     }
 
-    private static Board simulateMove(Board b, Coordinate move) {
+    public static Board simulateMove(Board b, Coordinate move) {
         var newBoard = new Board(b);
-        newBoard.put(move.x, move.y);
+        newBoard.put(move);
         return newBoard;
     }
 
-    private static Stream<Coordinate> legalMoves(Board b) {
-        var playableMoves = new HashSet<Coordinate>();
+    public static Stream<Coordinate> legalMoves(Board b) {
+        var playableMoves = new ArrayList<Coordinate>();
 
         for (int i = 0; i < b.getDimension(); i++) {
             for (int j = 0; j < b.getDimension(); j++) {
-                if (!b.isCellOccupied(i, j)) {
+                if (!b.isCellOccupied(new Coordinate(i, j))) {
                     playableMoves.add(new Coordinate(i, j));
                 }
             }
         }
 
         return playableMoves.stream();
+    }
+
+    public static boolean isThereWinner(Board b) {
+        return b.getGameState() == GameState.X_WINS || b.getGameState() == GameState.O_WINS;
+    }
+
+    public static Stream<Board> simulateLegalMoves(Board b) {
+        return legalMoves(b).map(move -> BoardMovesAnalytics.simulateMove(b, move));
     }
 }

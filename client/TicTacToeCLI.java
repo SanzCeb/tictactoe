@@ -3,6 +3,7 @@ package tictactoe.client;
 import tictactoe.player.*;
 import tictactoe.board.Board;
 import tictactoe.player.ai.TicTacToeEasyAI;
+import tictactoe.player.ai.TicTacToeHardAI;
 import tictactoe.player.ai.TicTacToeMediumAI;
 import tictactoe.player.user.UserCommand;
 import tictactoe.player.user.UserPlayer;
@@ -106,12 +107,12 @@ public class TicTacToeCLI {
                 continue;
             }
 
-            if (!tic_tac_toe.areCoordinatesInBound(coordinates.x, coordinates.y)) {
+            if (!tic_tac_toe.areCoordinatesInBound(coordinates)) {
                errMessage = String.format("Coordinates should be from 1 to %d!", BOARD_DIMENSION);
-            } else if (tic_tac_toe.isCellOccupied(coordinates.x, coordinates.y)) {
+            } else if (tic_tac_toe.isCellOccupied(coordinates)) {
                 errMessage = "This cell is occupied! Choose another one!";
             } else {
-                tic_tac_toe.put(coordinates.x, coordinates.y);
+                tic_tac_toe.put(coordinates);
                 turnNotFinished = false;
             }
 
@@ -132,6 +133,9 @@ public class TicTacToeCLI {
                 break;
             case "medium":
                 optionalPlayer = new TicTacToeMediumAI(tic_tac_toe);
+                break;
+            case "hard":
+                optionalPlayer = new TicTacToeHardAI(tic_tac_toe);
                 break;
             case "user":
                 optionalPlayer = new UserPlayer(BOARD_DIMENSION);

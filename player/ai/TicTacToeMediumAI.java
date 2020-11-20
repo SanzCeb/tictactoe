@@ -1,6 +1,7 @@
 package tictactoe.player.ai;
 
 import tictactoe.board.Board;
+import tictactoe.board.BoardMovesAnalytics;
 import tictactoe.player.Coordinate;
 
 import java.util.Optional;

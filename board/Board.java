@@ -1,5 +1,7 @@
 package tictactoe.board;
 
+import tictactoe.player.Coordinate;
+
 import java.nio.CharBuffer;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -40,17 +42,17 @@ public class Board {
                 .iterator();
     }
 
-    public void put(int coordinateX, int coordinateY) {
-        var newGameState = simulatePut(coordinateX, coordinateY);
+    public void put(Coordinate coordinates) {
+        var newGameState = simulatePut(coordinates);
         if (newGameState != GameState.IMPOSSIBLE) {
-            this.board[coordinateX][coordinateY] = getPlayer();
+            this.board[coordinates.x][coordinates.y] = getPlayer();
             gameState = newGameState;
         }
     }
 
-    public boolean areCoordinatesInBound(int coordinateX, int coordinateY) {
-        return IntStream.range(0, board.length).anyMatch(number -> number == coordinateX) &&
-                IntStream.range(0, board.length).anyMatch(number -> number == coordinateY);
+    public boolean areCoordinatesInBound(Coordinate coordinates) {
+        return IntStream.range(0, board.length).anyMatch(number -> number == coordinates.x) &&
+                IntStream.range(0, board.length).anyMatch(number -> number == coordinates.y);
     }
 
     public int getDimension() {
@@ -58,8 +60,8 @@ public class Board {
     }
 
     private GameState analyzeBoard() {
-        GameState output = GameState.IMPOSSIBLE;
-        if (isNotFinished() || gameState == GameState.IMPOSSIBLE) {
+        GameState output = gameState;
+        if (isNotFinished() || output == GameState.IMPOSSIBLE) {
             if (gameImpossible()) {
                 output = GameState.IMPOSSIBLE;
             } else if (playerWins('X')) {
@@ -122,11 +124,11 @@ public class Board {
         return Math.abs(numOs - numXs) > 1 || playerWins('X') && playerWins('O');
     }
 
-    private GameState simulatePut(int coordinateX, int coordinateY) {
+    private GameState simulatePut(Coordinate coordinate) {
         var newBoard = new Board (board, gameState);
         try {
-            if (!isCellOccupied(coordinateX, coordinateY)) {
-                newBoard.board[coordinateX][coordinateY] = getPlayer();
+            if (!isCellOccupied(coordinate)) {
+                newBoard.board[coordinate.x][coordinate.y] = getPlayer();
             } else{
                 return GameState.IMPOSSIBLE;
             }
@@ -140,8 +142,8 @@ public class Board {
         return gameState == GameState.X_TURN ? 'X' : 'O';
     }
 
-    public boolean isCellOccupied(int coordinateX, int coordinateY) {
-        return this.board[coordinateX][coordinateY] != '_';
+    public boolean isCellOccupied(Coordinate coordinate) {
+        return this.board[coordinate.x][coordinate.y] != '_';
     }
 
     public boolean isNotFinished() {
